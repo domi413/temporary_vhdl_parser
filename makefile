@@ -25,25 +25,23 @@ clean:
 
 run: build
 	@echo "Running the VHDL parser..."
-	@echo "Usage: ./build/vhdl_parser -i <input_file>"
 	@if [ -f "example/hello.vhd" ]; then \
-		echo "Example: ./build/vhdl_parser -i example/hello.vhd"; \
-		./build/vhdl_parser -i example/hello.vhd; \
+		./build/vhdl_parser example/hello.vhd; \
 	else \
-		echo "No example file found. Please specify an input file with -i flag."; \
+		echo "No example file found."; \
 	fi
 
 test: build
 	@echo "Testing with example file..."
 	@if [ -f "example/hello.vhd" ]; then \
-		./build/vhdl_parser -i example/hello.vhd; \
+		./build/vhdl_parser example/hello.vhd; \
 	else \
 		echo "No example file found."; \
 	fi
 
 help: build
-	@echo "Running VHDL parser help..."
-	@./build/vhdl_parser --help
+	@echo "VHDL Parser - Usage: ./build/vhdl_parser [input_file]"
+	@echo "Default input file: example/hello.vhd"
 
 check-format:
 	@echo "Checking code formatting..."

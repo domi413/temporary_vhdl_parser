@@ -20,20 +20,22 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ==================================================================
-# Subdirectories and Libraries
+# Compiler Flags
 # ==================================================================
 
-add_subdirectory(parse)
+# Suppress deprecated literal operator warning for third-party peglib.h
+if(
+    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+)
+    add_compile_options(-Wno-deprecated-literal-operator)
+endif()
 
 # ==================================================================
 # Main Executable
 # ==================================================================
 
 add_executable(vhdl_parser vhdl_parser.cpp)
-
-target_link_libraries(vhdl_parser PRIVATE parse)
-
-target_include_directories(vhdl_parser PRIVATE parse)
 
 # ==================================================================
 # Installation
