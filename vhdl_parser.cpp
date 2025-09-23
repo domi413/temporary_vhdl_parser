@@ -17,7 +17,7 @@ auto readFile(const std::filesystem::path &file_path) -> std::string
 
 auto main() -> int
 {
-    std::filesystem::path hdl_file_path = "example/hello.vhd";
+    std::filesystem::path hdl_file_path = "example/big_file.vhd";
     const std::filesystem::path grammar_path = "grammar/vhdl2008.peg";
 
     // Read grammar file
