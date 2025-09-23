@@ -8,16 +8,14 @@ LINT_TIDY_FLAGS = --warnings-as-errors='*'
 all: clean build
 
 build:
-	@echo "Configuring and building VHDL parser..."
-	@mkdir -p build
-	@cd build && cmake .. -DCMAKE_BUILD_TYPE=Release
-	@cd build && make -j$(nproc)
+	@echo "Configuring and building with Ninja..."
+	@cmake -B build -DCMAKE_BUILD_TYPE=Release -GNinja
+	@cmake --build build
 
 debug:
-	@echo "Configuring and building VHDL parser in debug mode..."
-	@mkdir -p build
-	@cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug
-	@cd build && make -j$(nproc)
+	@echo "Configuring and building in debug mode..."
+	@cmake -B build -DCMAKE_BUILD_TYPE=Debug -GNinja
+	@cmake --build build
 
 clean:
 	@echo "Removing build directory..."
@@ -71,7 +69,7 @@ lint: build
 
 install: build
 	@echo "Installing VHDL parser..."
-	@cd build && make install
+	@cd build && ninja install
 
 
 fix: build

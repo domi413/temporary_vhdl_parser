@@ -21,15 +21,15 @@ auto main() -> int
     const std::filesystem::path grammar_path = "grammar/vhdl2008.peg";
 
     // Read grammar file
-    const auto grammar_content = readFile(grammar_path);
-    if (grammar_content.empty()) {
+    const auto grammar = readFile(grammar_path);
+    if (grammar.empty()) {
         std::println(
           std::cerr, "Error: Could not load grammar file from {}", grammar_path.string());
         return 1;
     }
 
     // Create parser
-    peg::parser vhdl_parser{ grammar_content };
+    peg::parser vhdl_parser{ grammar };
     if (!vhdl_parser) {
         std::println(std::cerr, "Error: Failed to create parser from grammar");
         return 1;

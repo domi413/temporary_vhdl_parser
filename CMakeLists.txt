@@ -37,6 +37,33 @@ endif()
 
 add_executable(vhdl_parser vhdl_parser.cpp)
 
+target_compile_options(
+    vhdl_parser
+    PRIVATE
+        # Optimization
+        -O3
+        # Warnings
+
+        -Wall
+        -Wcast-align
+        -Wdouble-promotion
+        -Werror
+        -Wextra
+        -Wformat=2
+        -Wmisleading-indentation
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpedantic
+        -Wunused
+
+        # The following are failing due to peglib.h (this should be resolved if we install peglib through vcpkg)
+        # -Wconversion
+        # -Wnull-dereference
+        # -Wshadow
+        # -Wsign-conversion
+)
+
 # ==================================================================
 # Installation
 # ==================================================================
