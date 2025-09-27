@@ -6,6 +6,8 @@ SOURCES_CMake = $(shell find . -name "CMakeLists.txt")
 all: clean build
 
 build:
+	@echo "Setting up Conan profile..."
+	@conan profile detect --force 2>/dev/null || true
 	@echo "Installing Conan dependencies..."
 	@conan install . --build=missing -s compiler.cppstd=23
 	@echo "Configuring and building with Conan..."

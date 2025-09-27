@@ -1,3 +1,10 @@
 *.cache
 build/
 vcpkg_installed/
+
+# Conan generated files
+CMakeUserPresets.json
+conandata.yml
+conaninfo.txt
+conanbuildinfo.*
+conan.lock

@@ -199,6 +199,9 @@ jobs:
               python-gersemi
           "
 
+      - name: Setup Conan profile
+        run: conan profile detect --force
+
       - name: Build
         run: make build
 
