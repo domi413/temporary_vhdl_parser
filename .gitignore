@@ -8,3 +8,6 @@ conandata.yml
 conaninfo.txt
 conanbuildinfo.*
 conan.lock
+
+# clangd symlink
+compile_commands.json

@@ -13,6 +13,8 @@ build:
 	@echo "Configuring and building with Conan..."
 	@cmake --preset=conan
 	@cmake --build build/Release
+	@echo "Creating symlink for clangd..."
+	@ln -sf build/Release/compile_commands.json .
 
 clean:
 	@echo "Removing build directory..."

@@ -8,6 +8,7 @@ Checks: >
   -fuchsia-trailing-return,
   -llvm-header-guard,
   -readability-identifier-length,
+  -bugprone-exception-escape,-warnings-as-errors, # ONLY IGNORE IN THIS EXAMPLE REPO
 
 CheckOptions:
   # Types start with upper case (PascalCase): MyClass
