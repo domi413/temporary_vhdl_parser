@@ -1,6 +1,8 @@
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <peglib.h>
 #include <print>
 #include <string>
@@ -19,7 +21,7 @@ auto readFile(const std::filesystem::path &file_path) -> std::string
 
 auto main() -> int
 {
-    std::filesystem::path hdl_file_path = "example/hello.vhd";
+    const std::filesystem::path hdl_file_path = "example/hello.vhd";
     const std::filesystem::path grammar_path = "grammar/vhdl2008.peg";
 
     // Read grammar file
@@ -54,7 +56,7 @@ auto main() -> int
     }
 
     // Parse and output AST
-    std::shared_ptr<peg::Ast> ast;
+    const std::shared_ptr<peg::Ast> ast;
     if (const bool parse_success = vhdl_parser.parse(vhdl_content, ast); parse_success && ast) {
         std::println("{}", peg::ast_to_s(ast));
         return 0;
