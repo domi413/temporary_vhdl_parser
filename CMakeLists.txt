@@ -64,21 +64,21 @@ target_compile_options(
         # Warnings
         -Wall
         -Wcast-align
+        -Wconversion
         -Wdouble-promotion
         -Werror
         -Wextra
         -Wformat=2
+        # -Wlifetime # Not available yet
         -Wmisleading-indentation
         -Wnon-virtual-dtor
+        -Wnull-dereference
         -Wold-style-cast
         -Woverloaded-virtual
         -Wpedantic
-        -Wunused
-        # Re-enable warnings for our own code after disabling them globally for peglib
-        -Wconversion
-        # -Wnull-dereference
         -Wshadow
         -Wsign-conversion
+        -Wunused
 )
 
 # ==================================================================
