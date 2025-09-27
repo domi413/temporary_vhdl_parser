@@ -143,45 +143,70 @@ jobs:
   #     # - name: Run tests
   #     #   run: make test
 
-  build:
-    runs-on: ${{ matrix.os }}
-    name: Build (${{ matrix.os }})
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest] #, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            triplet: x64-linux
-          # - os: macos-latest
-          #   triplet: x64-osx
-          # - os: windows-latest
-          #   triplet: x64-windows
-
-    env:
-      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+  lint:
+    runs-on: ubuntu-latest
+    name: Build, Lint, Format Check and Test
+    timeout-minutes: 20
+    container:
+      image: archlinux:base-devel
 
     if: ${{ !github.event.pull_request.draft }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
         with:
-          submodules: true
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
 
-      - name: Setup CMake and Ninja
-        uses: lukka/get-cmake@latest
+      - name: Install dependencies
+        run: |
+          # Install base packages
+          pacman -Sy --needed git base-devel --noconfirm
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        id: runvcpkg
+          # Create a non-root user for AUR operations
+          useradd -m -G wheel -s /bin/bash aur
+          echo 'aur ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-      - name: Prints output of run-vcpkg's action
-        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
+          # Create cache directories
+          mkdir -p /home/aur/.cache/yay
+          chown -R aur:aur /home/aur
 
-      - name: Run CMake with vcpkg.json manifest
-        uses: lukka/run-cmake@v10
-        with:
-          configurePreset: "vcpkg"
-          buildPreset: "vcpkg"
+          # Install yay
+          su - aur -c "
+            git clone https://aur.archlinux.org/yay.git
+            cd yay
+            makepkg -si --noconfirm
+          "
+
+          # Install packages
+          su - aur -c "
+            yay -Sy --noconfirm --needed \
+              clang \
+              conan-bin \
+              cmake \
+              make \
+              ninja \
+              python-gersemi
+          "
+
+      - name: Build
+        run: make build
+
+      - name: Check formatting
+        run: make check-format
+
+      - name: Run lint
+        run: make lint
+
+      # - name: Run tests
+      #   run: make test

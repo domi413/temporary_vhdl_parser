@@ -20,16 +20,23 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ==================================================================
-# Compiler Flags
+# Conan Integration
 # ==================================================================
+
+# Include Conan-generated toolchain and dependencies
+find_file(CONAN_TOOLCHAIN conan_toolchain.cmake PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
+if(CONAN_TOOLCHAIN)
+    include(${CONAN_TOOLCHAIN})
+endif()
 
 # ==================================================================
 # Dependencies
 # ==================================================================
 
-set(CPP_PEGLIB_INCLUDE_DIRS
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include"
-)
+find_package(spdlog REQUIRED)
+find_package(Catch2 REQUIRED)
+find_package(CLI11 REQUIRED)
+find_package(peglib REQUIRED)
 
 # ==================================================================
 # Main Executable
@@ -37,11 +44,17 @@ set(CPP_PEGLIB_INCLUDE_DIRS
 
 add_executable(vhdl_parser parser/vhdl_parser.cpp)
 
-target_include_directories(
+target_link_libraries(
     vhdl_parser
-    SYSTEM
-    PRIVATE ${CPP_PEGLIB_INCLUDE_DIRS}
+    PRIVATE
+        spdlog::spdlog
+        CLI11::CLI11
+        peglib
 )
+
+# ==================================================================
+# Compiler Flags
+# ==================================================================
 
 target_compile_options(
     vhdl_parser

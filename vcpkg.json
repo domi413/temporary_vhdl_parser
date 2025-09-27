@@ -1,3 +1,0 @@
-{
-  "dependencies": ["catch2", "spdlog", "cpp-peglib", "cli11"]
-}

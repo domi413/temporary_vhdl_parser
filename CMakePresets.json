@@ -1,13 +1,12 @@
 {
-  "version": 10,
+  "version": 6,
   "configurePresets": [
     {
-      "name": "vcpkg",
-      "displayName": "Default Config with vcpkg",
-      "description": "Default configuration using vcpkg",
+      "name": "conan",
+      "displayName": "Conan",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "binaryDir": "${sourceDir}/build/Release",
+      "toolchainFile": "${sourceDir}/build/Release/generators/conan_toolchain.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
@@ -16,9 +15,9 @@
   ],
   "buildPresets": [
     {
-      "name": "vcpkg",
-      "displayName": "Build with vcpkg",
-      "configurePreset": "vcpkg"
+      "name": "conan",
+      "displayName": "Build with Conan",
+      "configurePreset": "conan"
     }
   ]
 }

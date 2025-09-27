@@ -57,7 +57,7 @@ auto main() -> int
     }
 
     // Parse and output AST
-    const std::shared_ptr<peg::Ast> ast;
+    std::shared_ptr<peg::Ast> ast;
     if (const bool parse_success = vhdl_parser.parse(vhdl_content, ast); parse_success && ast) {
         std::println("{}", peg::ast_to_s(ast));
         return 0;

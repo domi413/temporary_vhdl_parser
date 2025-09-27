@@ -6,9 +6,11 @@ SOURCES_CMake = $(shell find . -name "CMakeLists.txt")
 all: clean build
 
 build:
-	@echo "Configuring and building with vcpkg..."
-	@cmake --preset=vcpkg
-	@cmake --build build
+	@echo "Installing Conan dependencies..."
+	@conan install . --build=missing -s compiler.cppstd=23
+	@echo "Configuring and building with Conan..."
+	@cmake --preset=conan
+	@cmake --build build/Release
 
 clean:
 	@echo "Removing build directory..."
@@ -16,11 +18,11 @@ clean:
 
 run: build
 	@echo "Running the VHDL parser..."
-	@./build/vhdl_parser
+	@./build/Release/vhdl_parser
 
 # debug: build
 # 	@echo "Running the VHDL parser in debug mode..."
-# 	@gdb ./build/vhdl_parser
+# 	@gdb ./build/Release/vhdl_parser
 
 check-format:
 	@echo "Checking code formatting..."
@@ -37,7 +39,7 @@ format:
 	@echo "✓ Code formatting complete"
 
 # Flags for clang-tidy
-LINT_COMMON_FLAGS = -p build/
+LINT_COMMON_FLAGS = -p build/Release/
 LINT_TIDY_FLAGS = --warnings-as-errors='*'
 
 lint: build
