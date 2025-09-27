@@ -1,10 +1,11 @@
-#include "peglib.h"
-
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <peglib.h>
 #include <print>
 #include <string>
 
+namespace {
 auto readFile(const std::filesystem::path &file_path) -> std::string
 {
     std::ifstream file(file_path);
@@ -14,10 +15,11 @@ auto readFile(const std::filesystem::path &file_path) -> std::string
     }
     return std::string{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
 }
+} // namespace
 
 auto main() -> int
 {
-    std::filesystem::path hdl_file_path = "example/big_file.vhd";
+    std::filesystem::path hdl_file_path = "example/hello.vhd";
     const std::filesystem::path grammar_path = "grammar/vhdl2008.peg";
 
     // Read grammar file

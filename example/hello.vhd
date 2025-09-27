@@ -1,27 +1,17 @@
--------------------------------------------------------------------------------
---
--- Copyright (c) 2022 Iain Waugh
--- All rights reserved.
---
--------------------------------------------------------------------------------
---
--- A very plain file
---
--------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+entity AndGate is
+    Port (
+        A : in  STD_LOGIC;
+        B : in  STD_LOGIC;
 
-entity hello_world is
-  port(
-    -- Clock and Reset signals
-    clk : in std_logic;
-    rst : in std_logic;
-
-    i_data_a : in unsigned(7 downto 0);
-    i_data_b : in unsigned(7 downto 0);
-
-    o_data : out unsigned(7 downto 0)
+        Z : out STD_LOGIC
     );
-end;
+
+end AndGate;
+
+architecture Behavioral of AndGate is
+begin
+    Z <= A and B;
+end Behavioral;

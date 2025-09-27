@@ -23,19 +23,25 @@ endif()
 # Compiler Flags
 # ==================================================================
 
-# Suppress deprecated literal operator warning for third-party peglib.h
-if(
-    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-    OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+# ==================================================================
+# Dependencies
+# ==================================================================
+
+set(CPP_PEGLIB_INCLUDE_DIRS
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include"
 )
-    add_compile_options(-Wno-deprecated-literal-operator)
-endif()
 
 # ==================================================================
 # Main Executable
 # ==================================================================
 
-add_executable(vhdl_parser vhdl_parser.cpp)
+add_executable(vhdl_parser parser/vhdl_parser.cpp)
+
+target_include_directories(
+    vhdl_parser
+    SYSTEM
+    PRIVATE ${CPP_PEGLIB_INCLUDE_DIRS}
+)
 
 target_compile_options(
     vhdl_parser
@@ -43,7 +49,6 @@ target_compile_options(
         # Optimization
         -O3
         # Warnings
-
         -Wall
         -Wcast-align
         -Wdouble-promotion
@@ -56,12 +61,11 @@ target_compile_options(
         -Woverloaded-virtual
         -Wpedantic
         -Wunused
-
-        # The following are failing due to peglib.h (this should be resolved if we install peglib through vcpkg)
-        # -Wconversion
+        # Re-enable warnings for our own code after disabling them globally for peglib
+        -Wconversion
         # -Wnull-dereference
-        # -Wshadow
-        # -Wsign-conversion
+        -Wshadow
+        -Wsign-conversion
 )
 
 # ==================================================================

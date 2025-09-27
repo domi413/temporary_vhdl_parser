@@ -1,0 +1,201 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+jobs:
+  dictionary:
+    runs-on: ubuntu-latest
+    name: Check dictionary sorting
+    timeout-minutes: 1
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if dictionary is sorted
+        run: |
+          BOLD_RED="\033[1;31m"
+          BOLD_YELLOW="\033[1;33m"
+          BOLD_GREEN="\033[1;32m"
+          RESET="\033[0m"
+
+          if [ ! -f ".cspell_ignored" ]; then
+            echo -e "${BOLD_RED}Error: .cspell_ignored not found${RESET}"
+            exit 1
+          fi
+
+          # Check if file is sorted (case-insensitive)
+          if sort -cf .cspell_ignored; then
+            echo -e "${BOLD_GREEN}✓ .cspell_ignored is properly sorted${RESET}"
+          else
+            echo -e "${BOLD_RED}Error: .cspell_ignored is not sorted alphabetically (case-insensitive)${RESET}"
+            echo -e "${BOLD_YELLOW}To fix this, run: sort -f .cspell_ignored -o .cspell_ignored${RESET}"
+            exit 1
+          fi
+        shell: bash
+
+  spellcheck:
+    runs-on: ubuntu-latest
+    name: Spellcheck
+    timeout-minutes: 1
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Starting cspell
+        uses: streetsidesoftware/cspell-action@v7
+        with:
+          files: ""
+          root: "."
+          check_dot_files: false
+          inline: error
+          treat_flagged_words_as_errors: false
+          suggestions: true
+          strict: true
+          config: ".cspell.yaml"
+          incremental_files_only: ${{ env.ACT != 'true' }}
+          verbose: true
+          use_cspell_files: false
+
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   name: Build, Lint, Format Check and Test
+  #   timeout-minutes: 20
+  #   container:
+  #     image: archlinux:base-devel
+
+  #   if: ${{ !github.event.pull_request.draft }}
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Cache dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           /var/cache/pacman/pkg
+  #           /home/aur/.cache/yay
+  #           /home/aur/yay
+  #         key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+  #         restore-keys: |
+  #           arch-deps-${{ runner.os }}-v1
+  #           arch-deps-${{ runner.os }}-
+
+  #     - name: Install dependencies
+  #       run: |
+  #         # Install base packages
+  #         pacman -Sy --needed git base-devel --noconfirm
+
+  #         # Create a non-root user for AUR operations
+  #         useradd -m -G wheel -s /bin/bash aur
+  #         echo 'aur ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+  #         # Create cache directories
+  #         mkdir -p /home/aur/.cache/yay
+  #         chown -R aur:aur /home/aur
+
+  #         # Install yay
+  #         su - aur -c "
+  #           git clone https://aur.archlinux.org/yay.git
+  #           cd yay
+  #           makepkg -si --noconfirm
+  #         "
+
+  #         # Install packages
+  #         su - aur -c "
+  #           yay -Sy --noconfirm --needed \
+  #             clang \
+  #             cmake \
+  #             gtkmm-4.0 \
+  #             glib2 \
+  #             make \
+  #             ninja \
+  #             spdlog \
+  #             sqlite \
+  #             sqlitecpp \
+  #             libevdev \
+  #             libinput \
+  #             pkgconf \
+  #             python-gersemi
+  #         "
+
+  #     - name: Build
+  #       run: make build
+
+  #     - name: Check formatting
+  #       run: make check-format
+
+  #     - name: Run lint
+  #       run: make lint
+
+  #     # - name: Run tests
+  #     #   run: make test
+
+  build:
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.os }})
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: windows-latest
+            triplet: x64-windows
+          - os: ubuntu-latest
+            triplet: x64-linux
+          - os: macos-latest
+            triplet: x64-osx
+
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: Setup CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - name: Install system dependencies
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y bison flex
+          else
+            exit 1
+            fi
+        shell: bash
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+        with:
+          vcpkgDirectory: "${{ runner.workspace }}/b/vcpkg"
+          vcpkgGitCommitId: "${{ matrix.vcpkgCommitId}}"
+          vcpkgJsonGlob: "**/vcpkg.json"
+
+      - name: Prints output of run-vcpkg's action
+        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
+
+      - name: Run CMake with vcpkg.json manifest
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: "default"
+          buildPreset: "default"

@@ -1,0 +1,23 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "vcpkg",
+      "displayName": "Default Config with vcpkg",
+      "description": "Default configuration using vcpkg",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "vcpkg",
+      "displayName": "Build with vcpkg",
+      "configurePreset": "vcpkg"
+    }
+  ]
+}
