@@ -24,7 +24,12 @@ endif()
 # ==================================================================
 
 # Include Conan-generated toolchain and dependencies
-find_file(CONAN_TOOLCHAIN conan_toolchain.cmake PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
+find_file(
+    CONAN_TOOLCHAIN
+    conan_toolchain.cmake
+    PATHS ${CMAKE_BINARY_DIR}
+    NO_DEFAULT_PATH
+)
 if(CONAN_TOOLCHAIN)
     include(${CONAN_TOOLCHAIN})
 endif()
@@ -44,13 +49,7 @@ find_package(peglib REQUIRED)
 
 add_executable(vhdl_parser parser/vhdl_parser.cpp)
 
-target_link_libraries(
-    vhdl_parser
-    PRIVATE
-        spdlog::spdlog
-        CLI11::CLI11
-        peglib
-)
+target_link_libraries(vhdl_parser PRIVATE spdlog::spdlog CLI11::CLI11 peglib)
 
 # ==================================================================
 # Compiler Flags

@@ -168,6 +168,15 @@ jobs:
             arch-deps-${{ runner.os }}-v1
             arch-deps-${{ runner.os }}-
 
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           # Install base packages
