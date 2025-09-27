@@ -24,7 +24,6 @@ endif()
 # Conan Integration
 # ==================================================================
 
-# Include Conan-generated toolchain and dependencies
 find_file(
     CONAN_TOOLCHAIN
     conan_toolchain.cmake
