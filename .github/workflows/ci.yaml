@@ -176,10 +176,6 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         id: runvcpkg
-        with:
-          vcpkgDirectory: "${{ runner.workspace }}/b/vcpkg"
-          vcpkgGitCommitId: "${{ matrix.vcpkgCommitId}}"
-          vcpkgJsonGlob: "**/vcpkg.json"
 
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
@@ -187,5 +183,5 @@ jobs:
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: "default"
-          buildPreset: "default"
+          configurePreset: "vcpkg"
+          buildPreset: "vcpkg"
